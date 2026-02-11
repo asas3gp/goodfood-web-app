@@ -51,5 +51,13 @@ https://asas3gp.github.io/goodfood-web-app
 
 ---
 
+## 🧠 What I Learned
+- Responsive layout structuring
+- DOM manipulation and modular JS architecture
+- Integrating Firebase for authentication
+- Translating Figma design into functional UI
+
+---
+
 ## 📄 License
 MIT License
