@@ -39,13 +39,8 @@ Designing a user-friendly food discovery website that works seamlessly across de
 
 ---
 
-## 📸 Preview
-(Add screenshots here later)
-
----
-
 ## 🔗 Live Demo
-(Add GitHub Pages link here later)
+https://asas3gp.github.io/goodfood-web-app 
 
 ---
 
