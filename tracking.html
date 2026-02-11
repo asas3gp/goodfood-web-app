@@ -1,0 +1,742 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GoodFood â€” Tracking Asupan Gizi</title>
+
+    <!-- Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- DaisyUI -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@2.51.5/dist/full.css"
+      rel="stylesheet"
+    />
+
+    <!-- Feather icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <!-- anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      :root {
+        --gf-green: #16a34a;
+        --gf-soft: #eefaf0;
+        --gf-text: #0f172a;
+      }
+      body {
+        font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI",
+          Roboto, Arial;
+        background: linear-gradient(180deg, var(--gf-soft) 0%, #ffffff 40%);
+        color: var(--gf-text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin: 0;
+        padding: 0;
+      }
+      .container-max {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      .card-soft {
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(10, 20, 15, 0.06);
+        border: 1px solid rgba(16, 24, 36, 0.04);
+      }
+      .muted {
+        color: #6b7280;
+      }
+      table th,
+      table td {
+        border-bottom: 1px solid rgba(16, 24, 36, 0.04);
+      }
+      .small {
+        font-size: 0.85rem;
+      }
+
+      /* Chart wrapper to lock height and prevent canvas from expanding */
+      .chart-wrapper {
+        height: 220px;
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+      }
+      @media (max-width: 640px) {
+        .chart-wrapper {
+          height: 180px;
+        }
+      }
+      .chart-wrapper canvas {
+        display: block;
+        max-height: 100%;
+        width: 100% !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <header class="py-4">
+      <div class="container-max flex items-center justify-between">
+        <img src="assets/good food icon.png" alt="GoodFood" class="h-10 object-contain" />
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="text-sm muted hover:underline">Beranda</a>
+          <a href="rekomendasi.html" class="text-sm muted hover:underline"
+            >Rekomendasi</a
+          >
+          <a href="#" class="text-sm muted hover:underline">Tracking</a>
+          <button id="back-btn" class="btn btn-ghost btn-sm">Kembali</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container-max grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left: Form + Controls -->
+      <section class="lg:col-span-2 space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold">Tracking Asupan Gizi</h1>
+            <p class="muted">
+              Tambahkan makanan yang dikonsumsi â€” catatan tersimpan otomatis.
+            </p>
+          </div>
+          <div class="text-right">
+            <div class="text-xs muted">CSV export/import untuk backup</div>
+          </div>
+        </div>
+
+        <!-- form -->
+        <div class="card-soft p-4">
+          <form
+            id="foodForm"
+            class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end"
+          >
+            <div>
+              <label class="small muted">Nama Makanan</label>
+              <input
+                id="f_name"
+                class="input input-bordered w-full"
+                placeholder="Contoh: Nasi + Ayam"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="small muted">Kalori (kkal)</label>
+              <input
+                id="f_kcal"
+                type="number"
+                min="0"
+                class="input input-bordered w-full"
+                placeholder="kkal"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="small muted">Protein (g)</label>
+              <input
+                id="f_prot"
+                type="number"
+                min="0"
+                class="input input-bordered w-full"
+                placeholder="protein (g)"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="small muted">Karbo (g)</label>
+              <input
+                id="f_carb"
+                type="number"
+                min="0"
+                class="input input-bordered w-full"
+                placeholder="karbo (g)"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="small muted">Harga (Rp)</label>
+              <input
+                id="f_price"
+                type="number"
+                min="0"
+                class="input input-bordered w-full"
+                placeholder="Harga"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="small muted">Tanggal</label>
+              <input
+                id="f_date"
+                type="date"
+                class="input input-bordered w-full"
+                value=""
+              />
+            </div>
+
+            <div class="md:col-span-3 flex gap-3">
+              <button type="submit" class="btn btn-success">
+                Tambah ke Catatan
+              </button>
+              <button type="button" id="exportCSV" class="btn btn-outline">
+                Export CSV
+              </button>
+              <label for="importFile" class="btn btn-ghost cursor-pointer"
+                >Import CSV</label
+              >
+              <input
+                id="importFile"
+                type="file"
+                accept=".csv,text/csv"
+                class="hidden"
+              />
+              <button
+                type="button"
+                id="clearToday"
+                class="btn btn-error btn-outline ml-auto"
+              >
+                Hapus Hari Ini
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- today's entries -->
+        <div class="card-soft p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="muted text-xs">Entri untuk</div>
+              <div id="todayLabel" class="font-semibold"></div>
+            </div>
+
+            <div class="text-right">
+              <div class="muted text-xs">Total Kalori</div>
+              <div id="sumKcal" class="font-semibold text-lg">0 kkal</div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full small">
+              <thead class="text-xs text-gray-500 text-left">
+                <tr>
+                  <th class="py-2">Makanan</th>
+                  <th class="py-2">kkal</th>
+                  <th class="py-2">Prot (g)</th>
+                  <th class="py-2">Carb (g)</th>
+                  <th class="py-2">Harga</th>
+                  <th class="py-2">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="entriesTbody" class="text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: totals + chart -->
+      <aside class="space-y-4">
+        <div class="card-soft p-4">
+          <div class="text-xs muted">Ringkasan Hari Ini</div>
+          <div class="mt-3">
+            <div class="flex items-center justify-between small">
+              <div>Kalori</div>
+              <div id="r_kcal" class="font-semibold">0 kkal</div>
+            </div>
+            <div class="flex items-center justify-between small mt-1">
+              <div>Protein</div>
+              <div id="r_prot" class="font-semibold">0 g</div>
+            </div>
+            <div class="flex items-center justify-between small mt-1">
+              <div>Karbo</div>
+              <div id="r_carb" class="font-semibold">0 g</div>
+            </div>
+            <div class="flex items-center justify-between small mt-1">
+              <div>Pengeluaran</div>
+              <div id="r_spend" class="font-semibold">Rp 0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-soft p-4">
+          <div class="text-xs muted">Grafik 7 Hari â€” Total Kalori</div>
+          <div class="chart-wrapper mt-3">
+            <canvas id="kcalChart"></canvas>
+          </div>
+          <div class="mt-3 text-right">
+            <button id="refreshChart" class="btn btn-ghost btn-sm">
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="card-soft p-4 small muted">
+          Tips singkat: catat setiap kali makan atau minum camilan. Jika lupa,
+          tambahkan di akhir hari dengan tanggal sesuai konsumsi.
+        </div>
+      </aside>
+    </main>
+
+    <!-- footer -->
+    <footer class="container-max py-8 muted text-sm">
+      <div class="flex items-center justify-between">
+        <div>&copy; 2025 GoodFood</div>
+        <div>Simple & practical</div>
+      </div>
+    </footer>
+
+    <!-- SCRIPT: logic for tracking -->
+    <script>
+      // ---------- Utilities ----------
+      const fmtRupiah = (v) => "Rp " + Number(v).toLocaleString("id-ID");
+      const storageKeyFor = (dateStr) => "gf_log_" + dateStr;
+
+      function todayISO(d = new Date()) {
+        return d.toISOString().split("T")[0];
+      }
+
+      // ---------- DOM Refs ----------
+      const fName = document.getElementById("f_name");
+      const fKcal = document.getElementById("f_kcal");
+      const fProt = document.getElementById("f_prot");
+      const fCarb = document.getElementById("f_carb");
+      const fPrice = document.getElementById("f_price");
+      const fDate = document.getElementById("f_date");
+      const foodForm = document.getElementById("foodForm");
+
+      const tbody = document.getElementById("entriesTbody");
+      const todayLabel = document.getElementById("todayLabel");
+      const sumKcal = document.getElementById("sumKcal");
+      const r_kcal = document.getElementById("r_kcal");
+      const r_prot = document.getElementById("r_prot");
+      const r_carb = document.getElementById("r_carb");
+      const r_spend = document.getElementById("r_spend");
+
+      const exportBtn = document.getElementById("exportCSV");
+      const importFile = document.getElementById("importFile");
+      const clearTodayBtn = document.getElementById("clearToday");
+      const backBtn = document.getElementById("back-btn");
+      const refreshChartBtn = document.getElementById("refreshChart");
+
+      // ---------- Local storage helpers ----------
+      function loadForDate(dateStr) {
+        try {
+          const raw = localStorage.getItem(storageKeyFor(dateStr));
+          return raw
+            ? JSON.parse(raw)
+            : { items: [], totals: { kcal: 0, protein: 0, carb: 0, spend: 0 } };
+        } catch (e) {
+          return {
+            items: [],
+            totals: { kcal: 0, protein: 0, carb: 0, spend: 0 },
+          };
+        }
+      }
+      function saveForDate(dateStr, data) {
+        localStorage.setItem(storageKeyFor(dateStr), JSON.stringify(data));
+      }
+
+      // ---------- Chart setup (create once, update many) ----------
+      const ctx = document.getElementById("kcalChart").getContext("2d");
+      let kcalChart = null;
+
+      function get7DayKcalData() {
+        const days = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          days.push(d);
+        }
+        const labels = days.map((d) =>
+          d.toLocaleDateString("id-ID", { day: "numeric", month: "short" })
+        );
+        const values = days.map((d) => {
+          const key = todayISO(d);
+          const raw = localStorage.getItem(storageKeyFor(key));
+          if (!raw) return 0;
+          try {
+            const obj = JSON.parse(raw);
+            return obj.totals.kcal || 0;
+          } catch (e) {
+            return 0;
+          }
+        });
+        return { labels, values, keys: days.map((d) => todayISO(d)) };
+      }
+
+      function createChartOnce() {
+        const data = get7DayKcalData();
+        const config = {
+          type: "line",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Kalori (kkal)",
+                data: data.values,
+                fill: true,
+                tension: 0.3,
+                borderWidth: 2,
+                pointRadius: 3,
+                backgroundColor: "rgba(16,163,82,0.08)",
+                borderColor: "rgba(16,163,82,0.95)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false, // use wrapper height
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 200 },
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: (ctx) => `${ctx.parsed.y} kkal` },
+              },
+            },
+          },
+        };
+        if (kcalChart) {
+          try {
+            kcalChart.destroy();
+          } catch (e) {}
+        }
+        kcalChart = new Chart(ctx, config);
+      }
+
+      // debounce helper to avoid frequent chart updates during big imports
+      function debounce(fn, wait) {
+        let t;
+        return function (...args) {
+          clearTimeout(t);
+          t = setTimeout(() => fn.apply(this, args), wait);
+        };
+      }
+
+      // update chart (replace data and call update)
+      const updateChart = debounce(function () {
+        if (!kcalChart) {
+          createChartOnce();
+          return;
+        }
+        const data = get7DayKcalData();
+        kcalChart.data.labels = data.labels;
+        kcalChart.data.datasets[0].data = data.values;
+        // smoother update
+        kcalChart.update();
+      }, 180); // 180ms debounce
+
+      // ---------- UI Rendering ----------
+      function renderEntriesFor(dateStr) {
+        const data = loadForDate(dateStr);
+        tbody.innerHTML = "";
+        if (!data.items.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="text-xs text-gray-400 py-3">Belum ada entri untuk tanggal ini.</td></tr>';
+        } else {
+          data.items.forEach((it, idx) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+            <td class="py-2">${escapeHtml(it.name)}</td>
+            <td class="py-2">${it.kcal}</td>
+            <td class="py-2">${it.protein}</td>
+            <td class="py-2">${it.carb}</td>
+            <td class="py-2">${fmtRupiah(it.price)}</td>
+            <td class="py-2">
+              <button class="btn btn-ghost btn-xs" data-edit="${idx}" title="Edit"><i data-feather="edit-3"></i></button>
+              <button class="btn btn-ghost btn-xs text-error" data-del="${idx}" title="Hapus"><i data-feather="trash-2"></i></button>
+            </td>
+          `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // totals
+        sumKcal.innerText = (data.totals.kcal || 0) + " kkal";
+        r_kcal.innerText = (data.totals.kcal || 0) + " kkal";
+        r_prot.innerText = (data.totals.protein || 0) + " g";
+        r_carb.innerText = (data.totals.carb || 0) + " g";
+        r_spend.innerText = fmtRupiah(data.totals.spend || 0);
+
+        todayLabel.innerText = new Date(dateStr).toLocaleDateString("id-ID", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        });
+        todayLabel.dataset.date = dateStr;
+
+        // event handlers for edit/delete
+        tbody.querySelectorAll("button[data-del]").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const idx = Number(e.currentTarget.getAttribute("data-del"));
+            if (!confirm("Hapus entri ini?")) return;
+            const d = loadForDate(dateStr);
+            const removed = d.items.splice(idx, 1)[0];
+            d.totals.kcal -= removed.kcal;
+            d.totals.protein -= removed.protein;
+            d.totals.carb -= removed.carb;
+            d.totals.spend -= removed.price;
+            saveForDate(dateStr, d);
+            renderEntriesFor(dateStr);
+            updateChart();
+          });
+        });
+
+        tbody.querySelectorAll("button[data-edit]").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const idx = Number(e.currentTarget.getAttribute("data-edit"));
+            const d = loadForDate(dateStr);
+            const it = d.items[idx];
+            // fill form (user can adjust & save; original removed)
+            fName.value = it.name;
+            fKcal.value = it.kcal;
+            fProt.value = it.protein;
+            fCarb.value = it.carb;
+            fPrice.value = it.price;
+            fDate.value = dateStr;
+            // remove original entry
+            d.items.splice(idx, 1);
+            d.totals.kcal -= it.kcal;
+            d.totals.protein -= it.protein;
+            d.totals.carb -= it.carb;
+            d.totals.spend -= it.price;
+            saveForDate(dateStr, d);
+            renderEntriesFor(dateStr);
+            updateChart();
+          });
+        });
+
+        feather.replace();
+      }
+
+      // escape minimal HTML to avoid injection into table cells
+      function escapeHtml(s = "") {
+        return String(s).replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[m])
+        );
+      }
+
+      // ---------- Form submit ----------
+      foodForm.addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        const name = fName.value.trim();
+        const kcal = Number(fKcal.value) || 0;
+        const prot = Number(fProt.value) || 0;
+        const carb = Number(fCarb.value) || 0;
+        const price = Number(fPrice.value) || 0;
+        const dateStr = fDate.value ? fDate.value : todayISO();
+
+        if (!name) {
+          alert("Isi nama makanan");
+          return;
+        }
+
+        const log = loadForDate(dateStr);
+        log.items.push({ name, kcal, protein: prot, carb, price });
+        log.totals.kcal += kcal;
+        log.totals.protein += prot;
+        log.totals.carb += carb;
+        log.totals.spend += price;
+        saveForDate(dateStr, log);
+
+        // reset form (keep date)
+        fName.value = "";
+        fKcal.value = "";
+        fProt.value = "";
+        fCarb.value = "";
+        fPrice.value = "";
+
+        renderEntriesFor(dateStr);
+        updateChart();
+
+        // feedback animation
+        anime({
+          targets: "#sumKcal",
+          scale: [1, 1.06, 1],
+          duration: 420,
+          easing: "easeOutQuad",
+        });
+      });
+
+      // ---------- Export CSV ----------
+      exportBtn.addEventListener("click", () => {
+        const keys = Object.keys(localStorage)
+          .filter((k) => k.startsWith("gf_log_"))
+          .sort();
+        if (!keys.length) {
+          alert("Tidak ada data untuk diekspor");
+          return;
+        }
+        const lines = [];
+        lines.push("date,name,kcal,protein,carb,price"); // header
+        keys.forEach((k) => {
+          const date = k.replace("gf_log_", "");
+          const d = JSON.parse(localStorage.getItem(k));
+          d.items.forEach((it) => {
+            lines.push(
+              `${date},"${it.name.replace(/"/g, '""')}",${it.kcal},${
+                it.protein
+              },${it.carb},${it.price}`
+            );
+          });
+        });
+        const blob = new Blob([lines.join("\n")], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "goodfood_logs.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // ---------- Import CSV ----------
+      importFile.addEventListener("change", (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const text = ev.target.result;
+          const rows = text
+            .split(/\r?\n/)
+            .map((r) => r.trim())
+            .filter(Boolean);
+          if (!rows.length) return alert("File kosong");
+          const start = rows[0].toLowerCase().startsWith("date,") ? 1 : 0;
+          let count = 0;
+          for (let i = start; i < rows.length; i++) {
+            const line = rows[i];
+            // try regex parse "date","name",kcal,prot,carb,price OR date,"name",...
+            const regexQuoted =
+              /^([^,]+),"(.*)",([^,]+),([^,]+),([^,]+),([^,]+)$/;
+            const mQuoted = line.match(regexQuoted);
+            let date, name, kcal, prot, carb, price;
+            if (mQuoted) {
+              date = mQuoted[1].replace(/(^"|"$)/g, "").trim();
+              name = mQuoted[2].replace(/""/g, '"').trim();
+              kcal = Number(mQuoted[3]) || 0;
+              prot = Number(mQuoted[4]) || 0;
+              carb = Number(mQuoted[5]) || 0;
+              price = Number(mQuoted[6]) || 0;
+            } else {
+              const parts = line.split(",");
+              if (parts.length < 6) continue;
+              date = parts[0].trim();
+              name = parts[1].replace(/^"|"$/g, "").replace(/""/g, '"').trim();
+              kcal = Number(parts[2]) || 0;
+              prot = Number(parts[3]) || 0;
+              carb = Number(parts[4]) || 0;
+              price = Number(parts[5]) || 0;
+            }
+            const key = storageKeyFor(date);
+            const data = localStorage.getItem(key)
+              ? JSON.parse(localStorage.getItem(key))
+              : {
+                  items: [],
+                  totals: { kcal: 0, protein: 0, carb: 0, spend: 0 },
+                };
+            const item = { name, kcal, protein: prot, carb, price };
+            data.items.push(item);
+            data.totals.kcal += item.kcal;
+            data.totals.protein += item.protein;
+            data.totals.carb += item.carb;
+            data.totals.spend += item.price;
+            localStorage.setItem(key, JSON.stringify(data));
+            count++;
+          }
+          alert("Import selesai â€” " + count + " entri ditambahkan.");
+          updateChart();
+          // re-render today's entries in case import included today
+          renderEntriesFor(todayISO());
+        };
+        reader.readAsText(f);
+        importFile.value = "";
+      });
+
+      // ---------- Clear today's data ----------
+      clearTodayBtn.addEventListener("click", () => {
+        const dateStr = todayISO();
+        if (!confirm("Hapus semua catatan untuk hari ini?")) return;
+        localStorage.removeItem(storageKeyFor(dateStr));
+        renderEntriesFor(dateStr);
+        updateChart();
+      });
+
+      // ---------- Misc ----------
+      backBtn.addEventListener("click", () => (location.href = "index.html"));
+      refreshChartBtn.addEventListener("click", () => updateChart());
+
+      // ---------- Utility: keep storage trimmed (housekeeping) ----------
+      (function housekeep() {
+        try {
+          const keys = Object.keys(localStorage)
+            .filter((k) => k.startsWith("gf_log_"))
+            .sort()
+            .reverse();
+          const keep = 90; // keep last 90 days by default
+          keys.slice(keep).forEach((k) => localStorage.removeItem(k));
+        } catch (e) {}
+      })();
+
+      // ---------- Init on load ----------
+      document.addEventListener("DOMContentLoaded", () => {
+        // set default date input to today
+        const today = todayISO();
+        fDate.value = today;
+
+        // create chart once and render UI for today
+        createChartOnce();
+        renderEntriesFor(today);
+
+        // small entrance animation
+        anime({
+          targets: ".card-soft",
+          translateY: [10, 0],
+          opacity: [0, 1],
+          delay: anime.stagger(60),
+          duration: 550,
+          easing: "easeOutCubic",
+        });
+
+        // replace feather icons
+        feather.replace();
+      });
+
+      // expose updateChart in case many operations happen (already debounced)
+      window.updateChart = updateChart;
+    </script>
+
+    <script>
+      feather.replace();
+    </script>
+  </body>
+</html>
+

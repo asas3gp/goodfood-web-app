@@ -1,0 +1,635 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GoodFood â€” Tempat Makan Sehat</title>
+
+    <!-- Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CDN & DaisyUI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@2.51.5/dist/full.css"
+      rel="stylesheet"
+    />
+
+    <!-- anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- Feather icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+      :root {
+        --gf-green: #16a34a;
+        --gf-soft: #f1fbf6;
+        --gf-text: #0f172a;
+      }
+      body {
+        font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI",
+          Roboto, Arial;
+        background: linear-gradient(180deg, var(--gf-soft) 0%, #ffffff 45%);
+        color: var(--gf-text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin: 0;
+        padding: 0;
+      }
+      .container-max {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      .card-soft {
+        background: rgba(255, 255, 255, 0.94);
+        border-radius: 12px;
+        box-shadow: 0 6px 22px rgba(10, 20, 15, 0.06);
+        border: 1px solid rgba(16, 24, 36, 0.04);
+      }
+      .muted {
+        color: #6b7280;
+      }
+      .place-img {
+        height: 140px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      .map-mock {
+        background: linear-gradient(180deg, #ecfff2, #ffffff);
+        border-radius: 8px;
+        border: 1px solid rgba(16, 24, 36, 0.04);
+        min-height: 260px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      @media (min-width: 1024px) {
+        .map-mock {
+          min-height: 320px;
+        }
+      }
+      .pill {
+        background: #ecfdf3;
+        color: var(--gf-green);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 13px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <header class="py-4">
+      <div class="container-max flex items-center justify-between">
+        <img src="assets/good food icon.png" alt="GoodFood" class="h-10 object-contain" />
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="text-sm muted hover:underline">Beranda</a>
+          <a href="rekomendasi.html" class="text-sm muted hover:underline"
+            >Menu</a
+          >
+          <a href="tracking.html" class="text-sm muted hover:underline"
+            >Tracking</a
+          >
+          <a href="#" class="text-sm muted hover:underline">Tempat</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container-max grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+      <!-- Left: search & filters -->
+      <aside class="lg:col-span-1 space-y-6">
+        <div class="card-soft p-4">
+          <h2 class="font-bold">Cari Tempat Makan</h2>
+          <p class="muted text-sm">
+            Cari berdasarkan nama, jarak, harga, atau rating.
+          </p>
+
+          <div class="mt-4 space-y-3">
+            <input
+              id="search"
+              class="input input-bordered w-full"
+              placeholder="Cari: Warung, kantin, bowl..."
+            />
+            <div class="grid grid-cols-2 gap-2">
+              <select id="sortBy" class="select select-bordered w-full">
+                <option value="recommended">Direkomendasikan</option>
+                <option value="distance">Terdekat</option>
+                <option value="price_asc">Harga Terendah</option>
+                <option value="rating">Rating</option>
+              </select>
+              <select id="priceFilter" class="select select-bordered w-full">
+                <option value="any">Semua Harga</option>
+                <option value="lt15000">Rp &lt; 15.000</option>
+                <option value="15000-20000">Rp 15.000 - 20.000</option>
+                <option value="gt20000">Rp &gt; 20.000</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <input
+                id="maxDistance"
+                type="number"
+                class="input input-bordered w-28"
+                placeholder="max km"
+              />
+              <button id="resetFilters" class="btn btn-ghost">Reset</button>
+            </div>
+
+            <div class="mt-2 text-xs muted">
+              Simpan tempat favorit dengan ikon â™¥ â€” akan tersimpan di browser
+              (localStorage).
+            </div>
+          </div>
+        </div>
+
+        <!-- Favorites quick list -->
+        <div class="card-soft p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold">Favoritmu</h3>
+              <div class="muted text-xs">Akses cepat</div>
+            </div>
+            <button id="clearFav" class="btn btn-ghost btn-xs text-error">
+              Bersihkan
+            </button>
+          </div>
+          <div id="favList" class="mt-3 space-y-2 text-sm muted">
+            Belum ada favorit.
+          </div>
+        </div>
+
+        <!-- simple map legend -->
+        <div class="card-soft p-4">
+          <div class="text-xs muted">Legenda Peta</div>
+          <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="p-2 rounded bg-green-50 text-green-700">W</span>
+              Warung
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="p-2 rounded bg-yellow-50 text-yellow-700">K</span>
+              Kantin
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="p-2 rounded bg-blue-50 text-blue-700">B</span> Bowl &
+              Salad
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="p-2 rounded bg-gray-100 text-gray-700">T</span>
+              Warteg
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center: list -->
+      <section class="lg:col-span-2 space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-bold">
+            Tempat Makan Sehat di Sekitar Kampus
+          </h1>
+          <div class="pill">Higienis â€¢ Terjangkau</div>
+        </div>
+
+        <!-- list + map -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="lg:col-span-2 space-y-4">
+            <div id="placesList" class="space-y-4">
+              <!-- JS renders place cards here -->
+            </div>
+          </div>
+
+          <!-- map mock -->
+          <div>
+            <div class="map-mock p-4 card-soft">
+              <!-- simple SVG mock-map with pins -->
+              <svg
+                viewBox="0 0 300 220"
+                class="w-full h-full"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  <linearGradient id="g" x1="0" x2="1">
+                    <stop offset="0" stop-color="#e9fff2" />
+                    <stop offset="1" stop-color="#ffffff" />
+                  </linearGradient>
+                </defs>
+                <rect
+                  x="0"
+                  y="0"
+                  width="100%"
+                  height="100%"
+                  fill="url(#g)"
+                ></rect>
+
+                <!-- "roads" -->
+                <path
+                  d="M10 40 C 80 20, 220 20, 290 40"
+                  stroke="#dcefe0"
+                  stroke-width="6"
+                  fill="none"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M10 120 C 80 100, 220 100, 290 120"
+                  stroke="#e9f6ee"
+                  stroke-width="6"
+                  fill="none"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M60 10 L 60 200"
+                  stroke="#eef7f2"
+                  stroke-width="6"
+                  fill="none"
+                  stroke-linecap="round"
+                />
+
+                <!-- pins (interactive via data-id on click handled by JS) -->
+                <g cursor="pointer" class="pin" data-id="1">
+                  <circle cx="60" cy="48" r="9" fill="#10a34a" />
+                  <text x="74" y="52" font-size="10" fill="#064e2b">
+                    Bu Lia
+                  </text>
+                </g>
+
+                <g cursor="pointer" class="pin" data-id="2">
+                  <circle cx="160" cy="32" r="9" fill="#ffb020" />
+                  <text x="174" y="36" font-size="10" fill="#7a4a02">
+                    Kantin Hijau
+                  </text>
+                </g>
+
+                <g cursor="pointer" class="pin" data-id="3">
+                  <circle cx="120" cy="140" r="9" fill="#3b82f6" />
+                  <text x="134" y="144" font-size="10" fill="#0b4ea1">
+                    Warteg Sehat
+                  </text>
+                </g>
+
+                <g cursor="pointer" class="pin" data-id="4">
+                  <circle cx="240" cy="98" r="9" fill="#8b5cf6" />
+                  <text x="254" y="102" font-size="10" fill="#3b0761">
+                    Bowl Corner
+                  </text>
+                </g>
+              </svg>
+            </div>
+            <div class="mt-3 text-xs muted">
+              Klik pin untuk melihat detail dan menandai favorit.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- footer -->
+    <footer class="container-max py-8 muted text-sm">
+      <div class="flex items-center justify-between">
+        <div>&copy; 2025 GoodFood</div>
+        <div>Praktis untuk anak kos</div>
+      </div>
+    </footer>
+
+    <!-- SCRIPT: mock data + interactions -->
+    <script>
+      // sample places dataset
+      const PLACES = [
+        {
+          id: 1,
+          name: "Warung Sehat Bu Lia",
+          priceRange: 15000,
+          rating: 4.6,
+          distanceKm: 0.4,
+          type: "warung",
+          desc: "Menu nasi sayur, pepes tahu, porsi mahasiswa, higienis.",
+          img: "https://images.unsplash.com/photo-1524182576065-09989d1d0a0b?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=6c8d4ef0c638b0c2a1b1b4f3d9e9a8b3",
+        },
+        {
+          id: 2,
+          name: "Kantin Hijau",
+          priceRange: 20000,
+          rating: 4.4,
+          distanceKm: 0.8,
+          type: "kantin",
+          desc: "Bowl sayur, tumis tempe, jus segar, tempat nyaman belajar.",
+          img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=7c6c1b3b5a3c9e7d5d4a6a3f1b2c4e6f",
+        },
+        {
+          id: 3,
+          name: "Warteg Sehat",
+          priceRange: 13000,
+          rating: 4.2,
+          distanceKm: 0.6,
+          type: "warteg",
+          desc: "Sayur lodeh, ayam kecap, lalapan â€” pilihan ekonomis.",
+          img: "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=3a9f9df2bb4b6b9ce6a2c3b7d9f5a6c7",
+        },
+        {
+          id: 4,
+          name: "Bowl Corner",
+          priceRange: 25000,
+          rating: 4.7,
+          distanceKm: 1.1,
+          type: "bowl",
+          desc: "Salad & grain bowl segar, cocok untuk diet seimbang.",
+          img: "https://images.unsplash.com/photo-1551184509-2f5f1b6f57b8?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=7b1d4a4f0b2a3c4b5d6e7f8a9b0c1d2e",
+        },
+      ];
+
+      // localStorage key for favorites
+      const FAV_KEY = "gf_favorites_v1";
+
+      // DOM
+      const placesList = document.getElementById("placesList");
+      const search = document.getElementById("search");
+      const sortBy = document.getElementById("sortBy");
+      const priceFilter = document.getElementById("priceFilter");
+      const maxDistance = document.getElementById("maxDistance");
+      const resetFilters = document.getElementById("resetFilters");
+      const favList = document.getElementById("favList");
+      const clearFav = document.getElementById("clearFav");
+
+      // load favorites
+      function loadFavs() {
+        try {
+          return JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
+        } catch (e) {
+          return [];
+        }
+      }
+      function saveFavs(a) {
+        localStorage.setItem(FAV_KEY, JSON.stringify(a));
+      }
+
+      function toggleFav(id) {
+        const favs = loadFavs();
+        const idx = favs.indexOf(id);
+        if (idx === -1) favs.push(id);
+        else favs.splice(idx, 1);
+        saveFavs(favs);
+        renderPlaces(currentFiltered());
+        renderFavList();
+      }
+
+      function isFav(id) {
+        return loadFavs().indexOf(id) !== -1;
+      }
+
+      // render favorites quick list
+      function renderFavList() {
+        const favs = loadFavs();
+        if (!favs.length) {
+          favList.innerHTML =
+            '<div class="text-xs text-gray-400">Belum ada favorit.</div>';
+          return;
+        }
+        favList.innerHTML = "";
+        favs.forEach((fid) => {
+          const p = PLACES.find((x) => x.id === fid);
+          if (!p) return;
+          const row = document.createElement("div");
+          row.className = "flex items-center justify-between";
+          row.innerHTML = `<div><div class="font-medium">${p.name}</div><div class="text-xs muted">${p.distanceKm} km â€¢ ${p.rating} â­</div></div>
+          <div><button class="btn btn-ghost btn-xs" data-go="${p.id}">Lihat</button></div>`;
+          favList.appendChild(row);
+        });
+        favList.querySelectorAll("button[data-go]").forEach((b) =>
+          b.addEventListener("click", (e) => {
+            const id = Number(e.currentTarget.getAttribute("data-go"));
+            focusPlaceOnList(id);
+          })
+        );
+      }
+
+      // filter & sort logic
+      function currentFiltered() {
+        const q = (search.value || "").trim().toLowerCase();
+        const price = priceFilter.value;
+        const sort = sortBy.value;
+        const maxD = Number(maxDistance.value) || Infinity;
+
+        let items = PLACES.filter((p) => {
+          const matchesQ =
+            p.name.toLowerCase().includes(q) ||
+            p.desc.toLowerCase().includes(q);
+          const matchesPrice =
+            price === "any" ||
+            (price === "lt15000" && p.priceRange < 15000) ||
+            (price === "15000-20000" &&
+              p.priceRange >= 15000 &&
+              p.priceRange <= 20000) ||
+            (price === "gt20000" && p.priceRange > 20000);
+          const matchesDist = p.distanceKm <= maxD;
+          return matchesQ && matchesPrice && matchesDist;
+        });
+
+        // sort
+        if (sort === "distance") {
+          items.sort((a, b) => a.distanceKm - b.distanceKm);
+        } else if (sort === "price_asc") {
+          items.sort((a, b) => a.priceRange - b.priceRange);
+        } else if (sort === "rating") {
+          items.sort((a, b) => b.rating - a.rating);
+        } else {
+          // recommended: combine rating & price & distance
+          items.sort(
+            (a, b) =>
+              b.rating -
+              a.rating +
+              (a.priceRange - b.priceRange) / 10000 +
+              (a.distanceKm - b.distanceKm) / 1
+          );
+        }
+        return items;
+      }
+
+      // render place cards
+      function renderPlaces(items) {
+        placesList.innerHTML = "";
+        if (!items.length) {
+          placesList.innerHTML =
+            '<div class="text-sm text-gray-500">Tidak ada tempat sesuai filter.</div>';
+          return;
+        }
+        items.forEach((p) => {
+          const card = document.createElement("div");
+          card.className = "card-soft p-3 flex gap-3";
+          card.innerHTML = `
+          <img src="${p.img}" alt="${
+            p.name
+          }" class="place-img w-40 flex-shrink-0"/>
+          <div class="flex-1">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-semibold">${p.name}</div>
+                <div class="text-xs muted">${p.desc}</div>
+                <div class="text-xs muted mt-1">${p.distanceKm} km â€¢ ${
+            p.rating
+          } â­</div>
+              </div>
+              <div class="text-right">
+                <div class="font-semibold text-green-700">${rupiah(
+                  p.priceRange
+                )}</div>
+                <button class="btn btn-ghost btn-sm mt-2" data-id="${
+                  p.id
+                }" title="Simpan favorit">
+                  <span class="fav-icon">${isFav(p.id) ? "â™¥" : "â™¡"}</span>
+                </button>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+              <button class="btn btn-sm btn-success" data-open="${
+                p.id
+              }">Lihat Menu</button>
+              <button class="btn btn-sm btn-ghost" data-directions="${
+                p.id
+              }">Arah</button>
+            </div>
+          </div>
+        `;
+          placesList.appendChild(card);
+        });
+
+        // attach favorite handlers
+        placesList.querySelectorAll("button[data-id]").forEach((b) => {
+          b.addEventListener("click", (e) => {
+            const id = Number(e.currentTarget.getAttribute("data-id"));
+            toggleFav(id);
+            // small animation
+            anime({
+              targets: e.currentTarget.querySelector(".fav-icon"),
+              scale: [1, 1.2, 1],
+              duration: 300,
+              easing: "easeOutBack",
+            });
+          });
+        });
+
+        // open menu (placeholder)
+        placesList.querySelectorAll("button[data-open]").forEach((b) => {
+          b.addEventListener("click", (e) => {
+            const id = Number(e.currentTarget.getAttribute("data-open"));
+            const p = PLACES.find((x) => x.id === id);
+            if (!p) return;
+            alert(
+              `${
+                p.name
+              }\n\nMenu (contoh): Nasi sayur, Pepes tahu, Tumis sayur.\nHarga rata-rata: ${rupiah(
+                p.priceRange
+              )}\nRating: ${p.rating} â­`
+            );
+          });
+        });
+
+        // directions (placeholder)
+        placesList.querySelectorAll("button[data-directions]").forEach((b) => {
+          b.addEventListener("click", (e) => {
+            const id = Number(e.currentTarget.getAttribute("data-directions"));
+            alert(
+              "Buka aplikasi peta di perangkatmu untuk melihat arah â€” ini mock demo."
+            );
+          });
+        });
+
+        // after render, update feather (if any) and animate cards
+        feather.replace && feather.replace();
+        anime({
+          targets: ".card-soft",
+          translateY: [8, 0],
+          opacity: [0, 1],
+          delay: anime.stagger(60),
+          easing: "easeOutCubic",
+        });
+      }
+
+      // helper rupiah
+      function rupiah(v) {
+        return "Rp " + Number(v).toLocaleString("id-ID");
+      }
+
+      // focus place in list (scroll into view)
+      function focusPlaceOnList(id) {
+        const btn = placesList.querySelector(`[data-open="${id}"]`);
+        if (btn) {
+          btn.scrollIntoView({ behavior: "smooth", block: "center" });
+          btn.classList.add("ring", "ring-green-200");
+          setTimeout(
+            () => btn.classList.remove("ring", "ring-green-200"),
+            1400
+          );
+        }
+      }
+
+      // map pin clicks: attach listener to svg pins
+      document.addEventListener("click", (e) => {
+        const el = e.target.closest(".pin, .pin *");
+        if (!el) return;
+        const pin = el.closest(".pin");
+        if (pin && pin.dataset && pin.dataset.id) {
+          const id = Number(pin.dataset.id);
+          focusPlaceOnList(id);
+        }
+      });
+
+      // reset filters
+      resetFilters.addEventListener("click", () => {
+        search.value = "";
+        sortBy.value = "recommended";
+        priceFilter.value = "any";
+        maxDistance.value = "";
+        renderPlaces(currentFiltered());
+      });
+
+      // clear favorites
+      clearFav.addEventListener("click", () => {
+        if (!confirm("Hapus semua favorit?")) return;
+        saveFavs([]);
+        renderPlaces(currentFiltered());
+        renderFavList();
+      });
+
+      // live filter events
+      [search, sortBy, priceFilter, maxDistance].forEach((el) =>
+        el.addEventListener("input", () => renderPlaces(currentFiltered()))
+      );
+
+      // initial render
+      document.addEventListener("DOMContentLoaded", () => {
+        renderPlaces(currentFiltered());
+        renderFavList();
+        feather.replace && feather.replace();
+        anime({
+          targets: ".card-soft",
+          translateY: [8, 0],
+          opacity: [0, 1],
+          delay: anime.stagger(60),
+          easing: "easeOutCubic",
+        });
+      });
+
+      // housekeeping: keep favorites valid if places removed (not needed here but good practice)
+      (function syncFavs() {
+        try {
+          const favs = loadFavs();
+          const valid = favs.filter((id) => PLACES.some((p) => p.id === id));
+          if (JSON.stringify(favs) !== JSON.stringify(valid)) saveFavs(valid);
+        } catch (e) {}
+      })();
+    </script>
+
+    <script>
+      feather.replace();
+    </script>
+  </body>
+</html>
+

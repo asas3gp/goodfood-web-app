@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Log Konsumsi - GoodFood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="brand" href="dashboard.html">
+          <img src="assets/good food icon.png" alt="GoodFood" />
+          <div>
+            <span class="brand-title">GoodFood</span>
+                      </div>
+        </a>
+        <nav class="nav-links">
+          <span class="nav-user">Hai, <strong data-user-name>Pengguna</strong></span>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="foods.html">Makanan</a>
+          <a href="logs.html">Log</a>
+          <a href="restaurants.html">Tempat</a>
+          <a href="budget.html">Budget</a>
+          <button class="btn btn-ghost" data-logout>Keluar</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="container">
+        <div class="section-title">
+          <div>
+            <h2>Riwayat konsumsi</h2>
+            <p>Pilih tanggal untuk melihat log makan.</p>
+          </div>
+          <div class="pill">Edit porsi langsung dari tabel.</div>
+        </div>
+
+        <div class="card card-soft" style="margin-bottom: 16px">
+          <label class="form-row" style="margin-bottom: 0">
+            <span>Tanggal</span>
+            <input class="input" type="date" id="logDateFilter" />
+          </label>
+        </div>
+
+        <div class="grid grid-3" style="margin-bottom: 16px">
+          <div class="card">
+            <div class="stat">
+              <span class="label">Kalori</span>
+              <span class="value small" id="sumCalories">0 kkal</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="stat">
+              <span class="label">Protein</span>
+              <span class="value small" id="sumProtein">0 g</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="stat">
+              <span class="label">Pengeluaran</span>
+              <span class="value small" id="sumSpend">Rp 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th>Porsi</th>
+                  <th>Kalori</th>
+                  <th>Protein</th>
+                  <th>Harga</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody"></tbody>
+            </table>
+          </div>
+          <div id="logsEmpty" class="empty" style="display: none; margin-top: 12px">
+            Belum ada log untuk tanggal ini.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="editLogModal" class="modal" role="dialog" aria-modal="true">
+      <div class="modal-card">
+        <h3>Edit porsi</h3>
+        <p id="editFoodName" class="pill"></p>
+        <form id="editLogForm" style="margin-top: 16px">
+          <input type="hidden" id="editLogId" />
+          <div class="form-row">
+            <label for="editServings">Porsi baru</label>
+            <input
+              class="input"
+              type="number"
+              id="editServings"
+              min="0.5"
+              step="0.5"
+              required
+            />
+          </div>
+          <div id="editLogError" style="color: #b91c1c; margin-bottom: 10px"></div>
+          <div class="form-actions">
+            <button class="btn btn-secondary" type="submit">Simpan</button>
+            <button class="btn btn-ghost" type="button" id="editCancel">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/logs.js"></script>
+  </body>
+</html>
+

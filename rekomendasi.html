@@ -1,0 +1,566 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GoodFood â€” Rekomendasi Menu</title>
+
+    <!-- Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- DaisyUI -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@2.51.5/dist/full.css"
+      rel="stylesheet"
+    />
+
+    <!-- anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- Feather icons (third-party) -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+      :root {
+        --gf-green: #16a34a;
+        --gf-soft: #eefaf0;
+        --gf-text: #0f172a;
+      }
+      body {
+        font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI",
+          Roboto, Arial;
+        background: linear-gradient(180deg, var(--gf-soft) 0%, #ffffff 40%);
+        color: var(--gf-text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin: 0;
+        padding: 0;
+      }
+      .container-max {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      .card-soft {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        box-shadow: 0 6px 22px rgba(10, 20, 15, 0.06);
+        border: 1px solid rgba(16, 24, 36, 0.04);
+      }
+      .muted {
+        color: #6b7280;
+      }
+      .pill {
+        background: #ecfdf3;
+        color: var(--gf-green);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 13px;
+        display: inline-block;
+      }
+      .menu-img {
+        height: 120px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      @media (min-width: 1024px) {
+        .grid-menu {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV (simple, horizontal logo) -->
+    <header class="py-4">
+      <div class="container-max flex items-center justify-between">
+        <img src="assets/good food icon.png" alt="GoodFood" class="h-10 object-contain" />
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="text-sm muted hover:underline">Beranda</a>
+          <a href="#" class="text-sm muted hover:underline">Rekomendasi</a>
+          <a href="tracking.html" class="text-sm muted hover:underline"
+            >Tracking</a
+          >
+          <button id="back-btn" class="btn btn-ghost btn-sm">Kembali</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container-max grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left / center: controls + menu list (span 2 on desktop) -->
+      <section class="lg:col-span-2 space-y-6">
+        <!-- header -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold">Rekomendasi Menu</h1>
+            <p class="muted">
+              Pilihan cepat & bergizi sesuai kantong anak kos.
+            </p>
+          </div>
+
+          <div class="text-right">
+            <div class="pill">Untuk Anak Kos</div>
+          </div>
+        </div>
+
+        <!-- controls -->
+        <div class="card-soft p-4 flex flex-col md:flex-row gap-3 items-center">
+          <div class="flex-1 w-full">
+            <input
+              id="search"
+              placeholder="Cari menu (contoh: nasi, mie, bowl)"
+              class="input input-bordered w-full"
+            />
+          </div>
+
+          <div class="flex items-center gap-3">
+            <select id="cookSelect" class="select select-bordered">
+              <option value="any">Semua (bisa masak / beli)</option>
+              <option value="can_cook">Bisa dimasak di kos</option>
+              <option value="no_cook">Hanya beli / no-cook</option>
+            </select>
+
+            <input
+              id="maxPrice"
+              type="number"
+              placeholder="Max Rp"
+              class="input input-bordered w-32"
+            />
+            <button id="resetFilters" class="btn btn-ghost">Reset</button>
+          </div>
+        </div>
+
+        <!-- menu grid -->
+        <div id="menuList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- JS will render menu cards here -->
+        </div>
+      </section>
+
+      <!-- Right: Today's log & totals -->
+      <aside class="space-y-4">
+        <div class="card-soft p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="muted text-xs">Ringkasan Hari Ini</div>
+              <div class="text-lg font-bold" id="todayDate"></div>
+            </div>
+            <div class="text-right">
+              <div class="muted text-xs">Kalori</div>
+              <div class="text-lg font-semibold" id="totalCalories">0 kkal</div>
+            </div>
+          </div>
+
+          <div class="mt-4 border-t pt-3">
+            <div class="flex items-center justify-between muted text-sm mb-2">
+              <div>Protein</div>
+              <div id="totalProtein">0 g</div>
+            </div>
+
+            <div class="flex items-center justify-between muted text-sm mb-2">
+              <div>Karbo</div>
+              <div id="totalCarb">0 g</div>
+            </div>
+
+            <div class="flex items-center justify-between muted text-sm">
+              <div>Pengeluaran</div>
+              <div id="totalSpend">Rp 0</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button
+              id="clearLog"
+              class="btn btn-sm btn-outline btn-error w-full"
+            >
+              Hapus Log Hari Ini
+            </button>
+          </div>
+        </div>
+
+        <div class="card-soft p-4">
+          <h3 class="font-semibold">Log Hari Ini</h3>
+          <div id="logItems" class="mt-3 space-y-2 muted text-sm">
+            <div class="text-xs text-gray-400">Belum ada item ditambahkan.</div>
+          </div>
+          <div class="mt-3 text-right">
+            <a href="tracking.html" class="link link-underline"
+              >Buka Tracking lengkap â†’</a
+            >
+          </div>
+        </div>
+
+        <div class="card-soft p-4">
+          <div class="text-sm muted">Petunjuk singkat</div>
+          <ul class="mt-2 text-sm list-disc list-inside muted">
+            <li>Pakai filter untuk menyesuaikan budget / kemampuan masak.</li>
+            <li>
+              Tekan "Tambah ke Log" setiap kali makan â€” ringkasan akan
+              terupdate.
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <!-- footer -->
+    <footer class="container-max py-8 muted text-sm">
+      <div class="flex items-center justify-between">
+        <div>&copy; 2025 GoodFood</div>
+        <div>Made for students â€¢ Simple & practical</div>
+      </div>
+    </footer>
+
+    <!-- SAMPLE DATA + LOGIC -->
+    <script>
+      // sample menu dataset (would normally come from backend)
+      const MENU = [
+        {
+          id: 1,
+          name: "Nasi + Ayam Bakar",
+          price: 18000,
+          kcal: 450,
+          protein: 28,
+          carb: 52,
+          img: "https://images.unsplash.com/photo-1525755662778-989d0524087e?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0f8ad3e8c1c6988e9a8b1d107a1a2c1a",
+          canCook: false,
+        },
+        {
+          id: 2,
+          name: "Mie Rebus Sayur",
+          price: 12000,
+          kcal: 320,
+          protein: 12,
+          carb: 55,
+          img: "https://images.unsplash.com/photo-1512058564366-c9e3b2b5f4cf?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=a7df5a7b9ab8f5a7a3a8e3f0d2b9a3a2",
+          canCook: true,
+        },
+        {
+          id: 3,
+          name: "Bowl Sayur + Telur",
+          price: 22000,
+          kcal: 380,
+          protein: 20,
+          carb: 45,
+          img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=7c6c1b3b5a3c9e7d5d4a6a3f1b2c4e6f",
+          canCook: false,
+        },
+        {
+          id: 4,
+          name: "Sandwich Tempe",
+          price: 10000,
+          kcal: 290,
+          protein: 15,
+          carb: 38,
+          img: "https://images.unsplash.com/photo-1547496502-affa22d388f3?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=abc4d5e0b3c6a7b8c9d0e1f2a3b4c5d6",
+          canCook: false,
+        },
+        {
+          id: 5,
+          name: "Tumis Sayur + Tahu",
+          price: 15000,
+          kcal: 260,
+          protein: 10,
+          carb: 32,
+          img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=1234567890abcdef1234567890abcdef",
+          canCook: true,
+        },
+        {
+          id: 6,
+          name: "Oat + Buah (no-cook)",
+          price: 12000,
+          kcal: 350,
+          protein: 8,
+          carb: 58,
+          img: "https://images.unsplash.com/photo-1484981184820-2e84ea0e0f5e?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0ff1e2d3c4b5a6d7e8f90123456789ab",
+          canCook: false,
+        },
+      ];
+
+      // utilities for currency formatting
+      const fmtRupiah = (v) =>
+        "Rp " + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+      // DOM refs
+      const menuList = document.getElementById("menuList");
+      const searchInput = document.getElementById("search");
+      const cookSelect = document.getElementById("cookSelect");
+      const maxPrice = document.getElementById("maxPrice");
+      const resetFilters = document.getElementById("resetFilters");
+
+      // log state (per day) persisted in localStorage
+      const todayKey = () => {
+        const d = new Date();
+        return "gf_log_" + d.toISOString().split("T")[0]; // eg gf_log_2025-11-28
+      };
+
+      function loadLog() {
+        const raw = localStorage.getItem(todayKey());
+        return raw
+          ? JSON.parse(raw)
+          : { items: [], totals: { kcal: 0, protein: 0, carb: 0, spend: 0 } };
+      }
+
+      function saveLog(log) {
+        localStorage.setItem(todayKey(), JSON.stringify(log));
+      }
+
+      function renderDate() {
+        const d = new Date();
+        const opt = { weekday: "short", day: "numeric", month: "short" };
+        document.getElementById("todayDate").innerText = d.toLocaleDateString(
+          "id-ID",
+          opt
+        );
+      }
+
+      function renderTotals() {
+        const log = loadLog();
+        document.getElementById("totalCalories").innerText =
+          log.totals.kcal + " kkal";
+        document.getElementById("totalProtein").innerText =
+          log.totals.protein + " g";
+        document.getElementById("totalCarb").innerText = log.totals.carb + " g";
+        document.getElementById("totalSpend").innerText = fmtRupiah(
+          log.totals.spend
+        );
+      }
+
+      function renderLogItems() {
+        const el = document.getElementById("logItems");
+        const log = loadLog();
+        el.innerHTML = "";
+        if (!log.items.length) {
+          el.innerHTML =
+            '<div class="text-xs text-gray-400">Belum ada item ditambahkan.</div>';
+          return;
+        }
+        log.items.forEach((it, idx) => {
+          const row = document.createElement("div");
+          row.className = "flex items-center justify-between";
+          row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <img src="${it.img}" alt="${
+            it.name
+          }" class="w-10 h-10 rounded-md object-cover"/>
+            <div>
+              <div class="font-medium text-sm">${it.name}</div>
+              <div class="text-xs muted">${it.kcal} kkal â€¢ ${fmtRupiah(
+            it.price
+          )}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-xs btn-ghost text-error" data-idx="${idx}"><i data-feather="trash-2"></i></button>
+          </div>
+        `;
+          el.appendChild(row);
+        });
+        // attach delete handlers
+        el.querySelectorAll("button[data-idx]").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const idx = Number(e.currentTarget.getAttribute("data-idx"));
+            removeLogItem(idx);
+          });
+        });
+        feather.replace();
+      }
+
+      function addToLog(menuId) {
+        const menu = MENU.find((m) => m.id === menuId);
+        if (!menu) return;
+        const log = loadLog();
+        log.items.push(menu);
+        log.totals.kcal += menu.kcal;
+        log.totals.protein += menu.protein;
+        log.totals.carb += menu.carb;
+        log.totals.spend += menu.price;
+        saveLog(log);
+        renderTotals();
+        renderLogItems();
+        // small animation feedback
+        anime({
+          targets: "#totalCalories",
+          scale: [1, 1.06, 1],
+          duration: 450,
+          easing: "easeOutQuad",
+        });
+      }
+
+      function removeLogItem(idx) {
+        const log = loadLog();
+        const [removed] = log.items.splice(idx, 1);
+        log.totals.kcal -= removed.kcal;
+        log.totals.protein -= removed.protein;
+        log.totals.carb -= removed.carb;
+        log.totals.spend -= removed.price;
+        saveLog(log);
+        renderTotals();
+        renderLogItems();
+      }
+
+      function clearLog() {
+        const empty = {
+          items: [],
+          totals: { kcal: 0, protein: 0, carb: 0, spend: 0 },
+        };
+        saveLog(empty);
+        renderTotals();
+        renderLogItems();
+      }
+
+      // render menu cards based on filters
+      function renderMenu(items) {
+        menuList.innerHTML = "";
+        if (!items.length) {
+          menuList.innerHTML =
+            '<div class="muted text-sm">Tidak ada menu sesuai filter.</div>';
+          return;
+        }
+        items.forEach((m) => {
+          const card = document.createElement("div");
+          card.className = "card-soft p-3 flex gap-3";
+          card.innerHTML = `
+          <img src="${m.img}" alt="${
+            m.name
+          }" class="w-36 h-24 rounded-md object-cover"/>
+          <div class="flex-1">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-semibold">${m.name}</div>
+                <div class="text-xs muted">${m.kcal} kkal â€¢ ${
+            m.protein
+          }g protein</div>
+              </div>
+              <div class="text-right">
+                <div class="font-semibold text-green-700">${fmtRupiah(
+                  m.price
+                )}</div>
+                <div class="text-xs muted">${
+                  m.canCook ? "Bisa dimasak" : "Siap beli"
+                }</div>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+              <button class="btn btn-sm btn-outline btn-success" data-add="${
+                m.id
+              }"><i data-feather="plus"></i> Tambah ke Log</button>
+              <button class="btn btn-sm btn-ghost" data-details="${
+                m.id
+              }"><i data-feather="info"></i> Detail</button>
+            </div>
+          </div>
+        `;
+          menuList.appendChild(card);
+        });
+        feather.replace();
+        // attach handlers
+        menuList.querySelectorAll("button[data-add]").forEach((b) => {
+          b.addEventListener("click", (e) => {
+            const id = Number(e.currentTarget.getAttribute("data-add"));
+            addToLog(id);
+          });
+        });
+        menuList.querySelectorAll("button[data-details]").forEach((b) => {
+          b.addEventListener("click", (e) => {
+            const id = Number(e.currentTarget.getAttribute("data-details"));
+            const m = MENU.find((x) => x.id === id);
+            if (!m) return;
+            alert(
+              `${m.name}\n\nKalori: ${m.kcal} kkal\nProtein: ${
+                m.protein
+              } g\nKarbo: ${m.carb} g\nHarga: ${fmtRupiah(
+                m.price
+              )}\n\nCatatan: ${
+                m.canCook ? "Bisa dimasak di kos." : "Siap beli."
+              }`
+            );
+          });
+        });
+
+        // small pop-in animation
+        anime({
+          targets: ".card-soft",
+          translateY: [8, 0],
+          opacity: [0, 1],
+          delay: anime.stagger(40),
+          duration: 550,
+          easing: "easeOutCubic",
+        });
+      }
+
+      // filtering logic
+      function applyFilters() {
+        const q = (searchInput.value || "").trim().toLowerCase();
+        const cook = cookSelect.value;
+        const maxP = Number(maxPrice.value) || Infinity;
+        let items = MENU.filter((m) => {
+          const matchesQ = m.name.toLowerCase().includes(q);
+          const matchesCook =
+            cook === "any" ||
+            (cook === "can_cook" && m.canCook) ||
+            (cook === "no_cook" && !m.canCook);
+          const matchesPrice = m.price <= maxP;
+          return matchesQ && matchesCook && matchesPrice;
+        });
+        renderMenu(items);
+      }
+
+      // init
+      document.addEventListener("DOMContentLoaded", () => {
+        renderDate();
+        renderTotals();
+        renderLogItems();
+        renderMenu(MENU);
+
+        // listeners
+        [searchInput, cookSelect, maxPrice].forEach((el) =>
+          el.addEventListener("input", applyFilters)
+        );
+        resetFilters.addEventListener("click", () => {
+          searchInput.value = "";
+          cookSelect.value = "any";
+          maxPrice.value = "";
+          applyFilters();
+        });
+
+        document.getElementById("clearLog").addEventListener("click", () => {
+          if (confirm("Hapus semua catatan hari ini?")) clearLog();
+        });
+
+        document
+          .getElementById("back-btn")
+          .addEventListener("click", () => (location.href = "index.html"));
+
+        // small entrance animation for header
+        anime
+          .timeline({ easing: "easeOutExpo", duration: 550 })
+          .add({ targets: "h1", translateY: [-10, 0], opacity: [0, 1] });
+      });
+
+      // remove old logs (optional): keep last 7 days only (prevent storage growth) â€” light housekeeping
+      (function housekeep() {
+        try {
+          const keys = Object.keys(localStorage)
+            .filter((k) => k.startsWith("gf_log_"))
+            .sort()
+            .reverse();
+          const keep = 7;
+          keys.slice(keep).forEach((k) => localStorage.removeItem(k));
+        } catch (e) {}
+      })();
+    </script>
+
+    <script>
+      // feather icons activation
+      feather.replace();
+    </script>
+  </body>
+</html>
+

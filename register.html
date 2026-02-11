@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Daftar - GoodFood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="brand" href="index.html">
+          <img src="assets/good food icon.png" alt="GoodFood" />
+          <div>
+            <span class="brand-title">GoodFood</span>
+                      </div>
+        </a>
+        <nav class="nav-links">
+          <a href="login.html">Masuk</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="container" style="max-width: 540px">
+        <div class="card">
+          <div class="section-title">
+            <h2>Buat akun baru</h2>
+            <p>Set budget harian agar rekomendasi langsung siap.</p>
+          </div>
+          <form id="registerForm">
+            <div class="form-row">
+              <label for="regName">Nama lengkap</label>
+              <input
+                class="input"
+                type="text"
+                id="regName"
+                placeholder="Nama kamu"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="regEmail">Email</label>
+              <input
+                class="input"
+                type="email"
+                id="regEmail"
+                placeholder="nama@email.com"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="regPassword">Password</label>
+              <input
+                class="input"
+                type="password"
+                id="regPassword"
+                placeholder="Minimal 6 karakter"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="regBudget">Budget harian (Rp)</label>
+              <input
+                class="input"
+                type="number"
+                id="regBudget"
+                min="0"
+                placeholder="Contoh: 25000"
+                required
+              />
+            </div>
+            <div id="registerError" style="color: #b91c1c; margin-bottom: 12px"></div>
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit">Daftar</button>
+              <a class="btn btn-ghost" href="login.html">Sudah punya akun</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+    <script type="module" src="js/auth.js"></script>
+  </body>
+</html>
+

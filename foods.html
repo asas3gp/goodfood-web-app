@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Makanan - GoodFood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="brand" href="dashboard.html">
+          <img src="assets/good food icon.png" alt="GoodFood" />
+          <div>
+            <span class="brand-title">GoodFood</span>
+                      </div>
+        </a>
+        <nav class="nav-links">
+          <span class="nav-user">Hai, <strong data-user-name>Pengguna</strong></span>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="foods.html">Makanan</a>
+          <a href="logs.html">Log</a>
+          <a href="restaurants.html">Tempat</a>
+          <a href="budget.html">Budget</a>
+          <button class="btn btn-ghost" data-logout>Keluar</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="container">
+        <div class="section-title">
+          <div>
+            <h2>Daftar makanan sehat</h2>
+            <p>Filter berdasarkan kategori dan cari nama menu.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-3" style="margin-bottom: 20px">
+          <div class="card card-soft">
+            <label class="form-row" style="margin-bottom: 0">
+              <span>Cari makanan</span>
+              <input class="input" id="foodSearch" type="search" placeholder="Contoh: ayam" />
+            </label>
+          </div>
+          <div class="card card-soft">
+            <label class="form-row" style="margin-bottom: 0">
+              <span>Kategori</span>
+              <select class="select" id="foodCategory"></select>
+            </label>
+          </div>
+          <div class="card card-soft">
+            <p>Tambahkan makanan ke log konsumsi harian.</p>
+          </div>
+        </div>
+
+        <div id="foodList" class="grid grid-3"></div>
+        <div id="foodEmpty" class="empty" style="display: none">
+          Belum ada data makanan. Jalankan fungsi seed untuk menambah contoh.
+        </div>
+      </section>
+    </main>
+
+    <div id="addLogModal" class="modal" role="dialog" aria-modal="true">
+      <div class="modal-card">
+        <h3>Tambah ke log</h3>
+        <p id="modalFoodName" class="pill"></p>
+        <p id="modalFoodPrice" class="pill"></p>
+        <a
+          id="modalMapsLink"
+          class="btn btn-ghost"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          style="margin-top: 10px"
+          >Buka Google Maps</a
+        >
+        <form id="addLogForm" style="margin-top: 16px">
+          <input type="hidden" id="selectedFoodId" />
+          <div class="form-row">
+            <label for="logDate">Tanggal</label>
+            <input class="input" type="date" id="logDate" required />
+          </div>
+          <div class="form-row">
+            <label for="logServings">Porsi</label>
+            <input
+              class="input"
+              type="number"
+              id="logServings"
+              min="0.5"
+              step="0.5"
+              value="1"
+              required
+            />
+          </div>
+          <div id="logError" style="color: #b91c1c; margin-bottom: 10px"></div>
+          <div class="form-actions">
+            <button class="btn btn-secondary" type="submit">Simpan</button>
+            <button class="btn btn-ghost" type="button" id="logCancel">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/foods.js"></script>
+  </body>
+</html>
+

@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tempat Makan - GoodFood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="brand" href="dashboard.html">
+          <img src="assets/good food icon.png" alt="GoodFood" />
+          <div>
+            <span class="brand-title">GoodFood</span>
+                      </div>
+        </a>
+        <nav class="nav-links">
+          <span class="nav-user">Hai, <strong data-user-name>Pengguna</strong></span>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="foods.html">Makanan</a>
+          <a href="logs.html">Log</a>
+          <a href="restaurants.html">Tempat</a>
+          <a href="budget.html">Budget</a>
+          <button class="btn btn-ghost" data-logout>Keluar</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="container">
+        <div class="section-title">
+          <div>
+            <h2>Rekomendasi tempat makan sehat</h2>
+            <p>Filter berdasarkan area dan urutkan sesuai preferensi.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-3" style="margin-bottom: 20px">
+          <div class="card card-soft">
+            <label class="form-row" style="margin-bottom: 0">
+              <span>Cari tempat</span>
+              <input class="input" id="restaurantSearch" type="search" placeholder="Contoh: kantin" />
+            </label>
+          </div>
+          <div class="card card-soft">
+            <label class="form-row" style="margin-bottom: 0">
+              <span>Area</span>
+              <select class="select" id="restaurantArea"></select>
+            </label>
+          </div>
+          <div class="card card-soft">
+            <label class="form-row" style="margin-bottom: 0">
+              <span>Urutkan</span>
+              <select class="select" id="restaurantSort">
+                <option value="distance">Jarak terdekat</option>
+                <option value="rating">Rating tertinggi</option>
+                <option value="price">Harga termurah</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div id="restaurantList" class="grid grid-2"></div>
+        <div id="restaurantEmpty" class="empty" style="display: none">
+          Belum ada data tempat makan. Jalankan fungsi seed untuk menambah contoh.
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/restaurants.js"></script>
+  </body>
+</html>
+

@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Budget - GoodFood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="brand" href="dashboard.html">
+          <img src="assets/good food icon.png" alt="GoodFood" />
+          <div>
+            <span class="brand-title">GoodFood</span>
+                      </div>
+        </a>
+        <nav class="nav-links">
+          <span class="nav-user">Hai, <strong data-user-name>Pengguna</strong></span>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="foods.html">Makanan</a>
+          <a href="logs.html">Log</a>
+          <a href="restaurants.html">Tempat</a>
+          <a href="budget.html">Budget</a>
+          <button class="btn btn-ghost" data-logout>Keluar</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="container">
+        <div class="section-title">
+          <div>
+            <h2>Catat pengeluaran dan topup</h2>
+            <p>Gunakan ini untuk mencatat transaksi di luar log makanan.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card reveal">
+            <form id="budgetForm">
+              <div class="form-row">
+                <label for="budgetType">Jenis</label>
+                <div class="radio-group" id="budgetType">
+                  <label class="radio-card">
+                    <input
+                      type="radio"
+                      name="budgetType"
+                      value="expense"
+                      checked
+                    />
+                    <span class="radio-label"
+                      ><i class="ri-arrow-down-circle-line"></i>Pengeluaran</span
+                    >
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="budgetType" value="topup" />
+                    <span class="radio-label"
+                      ><i class="ri-arrow-up-circle-line"></i>Topup</span
+                    >
+                  </label>
+                </div>
+              </div>
+              <div class="form-row">
+                <label for="budgetAmount">Nominal (Rp)</label>
+                <input
+                  class="input"
+                  type="number"
+                  id="budgetAmount"
+                  min="0"
+                  placeholder="Contoh: 12000"
+                  required
+                />
+              </div>
+              <div class="form-row">
+                <label for="budgetDate">Tanggal</label>
+                <input class="input" type="date" id="budgetDate" required />
+              </div>
+              <div class="form-row">
+                <label for="budgetNote">Catatan</label>
+                <input
+                  class="input"
+                  type="text"
+                  id="budgetNote"
+                  placeholder="Misal: makan siang di kantin"
+                />
+              </div>
+              <div id="budgetError" style="color: #b91c1c; margin-bottom: 10px"></div>
+              <div class="form-actions">
+                <button class="btn btn-secondary" type="submit">Simpan</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card reveal">
+            <div class="section-title">
+              <h2>Ringkasan</h2>
+              <p>Pengeluaran dan topup hari ini serta bulan ini.</p>
+            </div>
+            <div class="grid grid-2">
+              <div class="card card-soft">
+                <div class="stat">
+                  <span class="label">Pengeluaran hari ini</span>
+                  <span class="value small" id="todayExpense">Rp 0</span>
+                </div>
+              </div>
+              <div class="card card-soft">
+                <div class="stat">
+                  <span class="label">Topup hari ini</span>
+                  <span class="value small" id="todayTopup">Rp 0</span>
+                </div>
+              </div>
+              <div class="card card-soft">
+                <div class="stat">
+                  <span class="label">Pengeluaran bulan ini</span>
+                  <span class="value small" id="monthExpense">Rp 0</span>
+                </div>
+              </div>
+              <div class="card card-soft">
+                <div class="stat">
+                  <span class="label">Topup bulan ini</span>
+                  <span class="value small" id="monthTopup">Rp 0</span>
+                </div>
+              </div>
+            </div>
+            <div class="card card-soft" style="margin-top: 16px">
+              <p>Gunakan catatan ini untuk melihat pola pengeluaran di luar menu yang kamu log.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container" style="margin-top: 30px">
+        <div class="section-title">
+          <h2>Riwayat transaksi</h2>
+          <p>Catatan terbaru ditampilkan di bawah.</p>
+        </div>
+        <div class="card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Jenis</th>
+                <th>Nominal</th>
+                <th>Catatan</th>
+              </tr>
+            </thead>
+            <tbody id="budgetList"></tbody>
+          </table>
+          <div id="budgetEmpty" class="empty" style="display: none; margin-top: 12px">
+            Belum ada transaksi. Tambahkan yang pertama.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/budget.js"></script>
+  </body>
+</html>
+

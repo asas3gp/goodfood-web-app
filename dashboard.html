@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - GoodFood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="brand" href="dashboard.html">
+          <img src="assets/good food icon.png" alt="GoodFood" />
+          <div>
+            <span class="brand-title">GoodFood</span>
+                      </div>
+        </a>
+        <nav class="nav-links">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="foods.html">Makanan</a>
+          <a href="logs.html">Log</a>
+          <a href="restaurants.html">Tempat</a>
+          <a href="budget.html">Budget</a>
+          <button class="btn btn-ghost" data-logout>Keluar</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="container">
+        <div class="card greeting reveal">
+          <div>
+            <span class="pill">Dashboard</span>
+            <h2>Hai, <span data-user-name>Pengguna</span></h2>
+            <p class="muted">Pantau gizi dan budget harianmu dengan lebih rapi.</p>
+          </div>
+          <div class="pill">Universitas Gunadarma Depok</div>
+        </div>
+      </section>
+
+      <section class="container" style="margin-top: 24px">
+        <div class="section-title">
+          <div>
+            <h2>Ringkasan hari ini</h2>
+            <p>Statistik gizi dan budget kamu.</p>
+          </div>
+          <div class="pill">Update otomatis berdasarkan log</div>
+        </div>
+
+        <div class="grid grid-3">
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="icon-chip chip-amber"><i class="ri-fire-line"></i></div>
+              <span class="pill">Energi</span>
+            </div>
+            <div class="stat">
+              <span class="label">Kalori</span>
+              <span class="value" id="todayCalories">0 kkal</span>
+              <span class="pill">Protein <span id="todayProtein">0</span> g</span>
+            </div>
+          </div>
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="icon-chip chip-blue"><i class="ri-bar-chart-2-line"></i></div>
+              <span class="pill">Makro</span>
+            </div>
+            <div class="stat">
+              <span class="label">Karbohidrat</span>
+              <span class="value" id="todayCarbs">0 g</span>
+              <span class="pill">Lemak <span id="todayFat">0</span> g</span>
+            </div>
+          </div>
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="icon-chip chip-green"><i class="ri-wallet-3-line"></i></div>
+              <span class="pill">Budget</span>
+            </div>
+            <div class="stat">
+              <span class="label">Pengeluaran makan hari ini</span>
+              <span class="value" id="todaySpend">Rp 0</span>
+              <span class="pill">Topup hari ini <span id="todayTopup">Rp 0</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container" style="margin-top: 30px">
+        <div class="section-title">
+          <div>
+            <h2>Target gizi harian (AKG Kemenkes)</h2>
+            <p>Angka AKG rata-rata dewasa. Kebutuhan tiap orang bisa berbeda.</p>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="icon-chip chip-amber"><i class="ri-fire-line"></i></div>
+              <span class="pill">Kalori</span>
+            </div>
+            <div class="stat">
+              <span class="label">Target 2150 kkal kalori</span>
+              <span class="value small" id="goalCalText">0/2150 kkal</span>
+            </div>
+            <div class="progress-track" style="margin-top: 12px">
+              <div class="progress-fill" id="goalCalFill"></div>
+            </div>
+          </div>
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="icon-chip chip-purple"><i class="ri-heart-pulse-line"></i></div>
+              <span class="pill">Protein</span>
+            </div>
+            <div class="stat">
+              <span class="label">Target 60 g protein</span>
+              <span class="value small" id="goalProteinText">0/60 g</span>
+            </div>
+            <div class="progress-track" style="margin-top: 12px">
+              <div class="progress-fill" id="goalProteinFill"></div>
+            </div>
+          </div>
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="icon-chip chip-blue"><i class="ri-bread-line"></i></div>
+              <span class="pill">Karbo</span>
+            </div>
+            <div class="stat">
+              <span class="label icon-label">
+                <i class="ri-bread-line"></i>Target 325 g karbohidrat
+              </span>
+              <span class="value small" id="goalCarbsText">0/325 g</span>
+            </div>
+            <div class="progress-track" style="margin-top: 12px">
+              <div class="progress-fill" id="goalCarbsFill"></div>
+            </div>
+          </div>
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="icon-chip chip-rose"><i class="ri-drop-line"></i></div>
+              <span class="pill">Lemak</span>
+            </div>
+            <div class="stat">
+              <span class="label">Target 67 g lemak</span>
+              <span class="value small" id="goalFatText">0/67 g</span>
+            </div>
+            <div class="progress-track" style="margin-top: 12px">
+              <div class="progress-fill" id="goalFatFill"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container" style="margin-top: 30px">
+        <div class="grid grid-2">
+          <div class="card reveal">
+            <div class="section-title">
+              <h2>Quick add makanan</h2>
+              <p>Tambah log tanpa pindah halaman.</p>
+            </div>
+            <form id="quickAddForm">
+              <div class="form-row">
+                <label for="quickFoodSelect">Pilih makanan</label>
+                <select class="select" id="quickFoodSelect" required></select>
+              </div>
+              <div class="form-row">
+                <label for="quickServings">Porsi</label>
+                <input
+                  class="input"
+                  type="number"
+                  id="quickServings"
+                  min="0.5"
+                  step="0.5"
+                  value="1"
+                  required
+                />
+              </div>
+              <div class="form-row">
+                <label for="quickDate">Tanggal</label>
+                <input class="input" type="date" id="quickDate" required />
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-secondary" type="submit">Tambah log</button>
+              </div>
+              <div id="quickAddNote" class="pill" style="margin-top: 10px"></div>
+            </form>
+          </div>
+
+          <div class="card reveal">
+            <div class="section-title">
+              <h2>Sisa budget hari ini</h2>
+              <p>Hitungan dari budget harian yang kamu set.</p>
+            </div>
+            <div class="stat">
+              <span class="label">Budget harian</span>
+              <span class="value" id="dailyBudget">Rp 0</span>
+            </div>
+            <div class="stat" style="margin-top: 12px">
+              <span class="label">Sisa budget setelah makan</span>
+              <span class="value" id="todayRemain">Rp 0</span>
+            </div>
+            <div class="form-row" style="margin-top: 16px">
+              <label for="budgetInput">Atur budget harian (Rp)</label>
+              <input
+                class="input"
+                type="number"
+                id="budgetInput"
+                min="0"
+                placeholder="Contoh: 25000"
+              />
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-secondary" type="button" id="budgetSaveBtn">
+                Simpan Budget
+              </button>
+            </div>
+            <div class="card card-soft" style="margin-top: 16px">
+              <p id="budgetHint">Pastikan log makanan selalu terisi agar sisa budget akurat.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container" style="margin-top: 30px">
+        <div class="section-title">
+          <div>
+            <h2>Rekomendasi menu sesuai budget</h2>
+            <p>Diurutkan berdasarkan protein tertinggi.</p>
+          </div>
+          <a class="btn btn-ghost" href="foods.html">Lihat semua</a>
+        </div>
+        <div id="recommendList" class="grid grid-3"></div>
+        <div id="recommendEmpty" class="empty" style="display: none">
+          Budget kamu habis. Tambah topup di menu Budget untuk melihat rekomendasi.
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">Ringkas, sehat, dan terkontrol.</div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+  </body>
+</html>
+
